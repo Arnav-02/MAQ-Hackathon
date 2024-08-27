@@ -1,0 +1,117 @@
+'''
+This script is designed to monitor Telegram conversations for specific keywords related to drugs and substances.
+It uses the Telethon library to interact with the Telegram API and retrieve messages from a specified chat.
+The script then performs keyword matching on the retrieved messages and prints the results with an alert level based on the count of matched keywords.
+Additionally, the script generates random IP addresses and Indian phone numbers for two persons involved in the conversation.
+'''
+from telethon import TelegramClient
+import time
+
+#Constants
+api_id = 27245367 #this input is to be changed by the user(only for demo)
+api_hash = '334bbd56e9b8ca788924ab5671e38b1f' #this input is to be changed by the user(only for demo)
+
+# Create a Telegram client
+client = TelegramClient('session_name', api_id, api_hash)
+
+async def main():
+    # Wait for the client to start and connect
+    await client.start()
+    # Initialize variables
+    SrNo = 0
+    global k
+    L = []
+    Message = ""
+    while True :
+        # Get the username from the user
+        chat = input("Enter username :")
+        try :
+            # Iterate over the last 10 messages in the chat
+            async for message in client.iter_messages(chat, limit=10):
+                # Append the message to the list
+                txt = f"{message.sender_id} : {message.text}"
+                L.append(txt)
+                
+                Message = Message + message.text +"\n"
+            for i in L[::-1] :
+                SrNo += 1
+                print(SrNo,i)
+                time.sleep(1)
+            print("End of Conversation")
+        except :
+            break           
+with client:
+    client.loop.run_until_complete(main())
+
+
+import random
+def keyword_match(sentence, keywords):
+    words = sentence.lower().split()
+    sus = 0
+    drug_count = {}
+
+    for word in words:
+        if word in keywords:
+            sus += 1
+            if word in drug_count:
+                drug_count[word] += 1
+            else:
+                drug_count[word] = 1
+
+
+    return sus, drug_count
+
+def slang_detector(sentence, keywords):
+    words = sentence.lower().split()
+    slang_count = {}
+
+    for word in words:
+        if word in keywords:
+            if word in slang_count:
+                slang_count[word] += 1
+            else:
+                slang_count[word] = 1
+
+    return slang_count
+
+sentence = Message
+
+tier_A = [
+    "drugs", "alcohol", "nicotine", "marijuana", "cocaine", "heroin", "methamphetamine", "prescription",
+    "opioids", "benzodiazepines", "mdma", "lsd", "valium", "xanax", "kilos", "weed", "blow", "crack", "dope",
+    "ecstasy", "molly", "speed", "smack", "ice", "pot", "acid", "maal", "phukenge", "snow", "foggy",
+    "hash", "ganja", "joint", "blunt", "bong", "rope", "chronic", "kush", "haze", "skunk", "weed", "maryjane",
+    "amphetamine", "barbiturate", "benzo", "cannabis", "codeine", "fentanyl", "ghb", "ketamine", "meth",
+    "opium", "oxycodone", "pcp", "psilocybin", "ritalin", "steroid", "suboxone", "subutex", "tramadol",
+    "victoria", "vyvanse", "xanax", "zolpidem", "adderall", "ambien", "ativan", "clonazepam", "concerta",
+    "demerol", "dilaudid", "flexeril", "hydrocodone", "klonopin", "lorazepam", "oxycodone", "percocet",
+    "soma", "subutex", "tussionex", "vicodin", "vyvanse", "xanax"
+]
+
+tier_B = [
+    "weed", "blow", "crack", "dope", "ecstasy", "molly", "speed", "smack", "ice", "pot", "acid", "maal", "phukenge"]
+
+match_count, drug_count = keyword_match(sentence, tier_A)
+print(f"Suspected keyword matches : {match_count}")
+for drug, count in drug_count.items():
+    print(f"{drug.capitalize()} : {count} times")
+
+slang_count = slang_detector(sentence, tier_B)
+print("NUMBER OF TIMES THE WORD IS USED--->")
+for slang, count in slang_count.items():
+    print(f"{slang.capitalize()} : {count} times")
+
+#This is a random IP and Phone Number generator.
+def generate_random_ip():
+    return '.'.join(str(random.randint(0, 255)) for _ in range(4))                  
+ip1 = generate_random_ip()
+print("IP ADDRESS OF PERSON 1: ",ip1)
+ip2 = generate_random_ip()
+print("IP ADDRESS OF PERSON 2: ",ip2)
+def generate_random_indian_phone_number() -> str:
+    """Generate a random Indian phone number."""
+    return "+91 " + str(random.randint(7000000000, 9999999999))
+ph1 = generate_random_indian_phone_number()
+print("PHONE NUMBER OF PERSON 1: ",ph1)
+ph2 = generate_random_indian_phone_number()
+print("PHONE NUMBER OF PERSON 2: ",ph2)
